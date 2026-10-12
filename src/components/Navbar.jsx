@@ -22,9 +22,14 @@ export default function Navbar() {
             Shop
           </Link>
           {user && (
-            <Link to="/orders" className="px-3 py-2 rounded-lg hover:bg-slate-100">
-              Orders
-            </Link>
+            <>
+              <Link to="/orders" className="px-3 py-2 rounded-lg hover:bg-slate-100">
+                Orders
+              </Link>
+              <Link to="/wishlist" className="px-3 py-2 rounded-lg hover:bg-slate-100">
+                ❤️
+              </Link>
+            </>
           )}
           {user?.is_admin && (
             <Link

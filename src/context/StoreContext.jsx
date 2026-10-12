@@ -12,6 +12,7 @@ export function StoreProvider({ children }) {
     }
   });
   const [cart, setCart] = useState({ items: [], subtotal: '0.00', count: 0 });
+  const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const refreshCart = useCallback(async () => {
@@ -27,6 +28,27 @@ export function StoreProvider({ children }) {
     }
   }, []);
 
+  const refreshWishlist = useCallback(async () => {
+    if (!localStorage.getItem('shop_token')) {
+      setWishlist([]);
+      return;
+    }
+    try {
+      const { data } = await api.get('/wishlist');
+      setWishlist((data.data || []).map((p) => p.id));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const toggleWishlist = async (productId) => {
+    const { data } = await api.post('/wishlist', { product_id: productId });
+    setWishlist((w) =>
+      data.wishlisted ? [...w, productId] : w.filter((id) => id !== productId)
+    );
+    return data.wishlisted;
+  };
+
   const fetchMe = useCallback(async () => {
     if (!localStorage.getItem('shop_token')) {
       setLoading(false);
@@ -36,7 +58,7 @@ export function StoreProvider({ children }) {
       const { data } = await api.get('/me');
       setUser(data.data);
       localStorage.setItem('shop_user', JSON.stringify(data.data));
-      await refreshCart();
+      await Promise.all([refreshCart(), refreshWishlist()]);
     } catch {
       localStorage.removeItem('shop_token');
       localStorage.removeItem('shop_user');
@@ -55,7 +77,7 @@ export function StoreProvider({ children }) {
     localStorage.setItem('shop_token', data.token);
     localStorage.setItem('shop_user', JSON.stringify(data.user));
     setUser(data.user);
-    await refreshCart();
+    await Promise.all([refreshCart(), refreshWishlist()]);
     return data.user;
   };
 
@@ -64,7 +86,7 @@ export function StoreProvider({ children }) {
     localStorage.setItem('shop_token', data.token);
     localStorage.setItem('shop_user', JSON.stringify(data.user));
     setUser(data.user);
-    await refreshCart();
+    await Promise.all([refreshCart(), refreshWishlist()]);
     return data.user;
   };
 
@@ -78,6 +100,7 @@ export function StoreProvider({ children }) {
     localStorage.removeItem('shop_user');
     setUser(null);
     setCart({ items: [], subtotal: '0.00', count: 0 });
+    setWishlist([]);
   };
 
   const addToCart = async (productId, quantity = 1) => {
@@ -87,7 +110,19 @@ export function StoreProvider({ children }) {
 
   return (
     <StoreContext.Provider
-      value={{ user, cart, loading, login, register, logout, refreshCart, addToCart }}
+      value={{
+        user,
+        cart,
+        wishlist,
+        loading,
+        login,
+        register,
+        logout,
+        refreshCart,
+        refreshWishlist,
+        toggleWishlist,
+        addToCart,
+      }}
     >
       {children}
     </StoreContext.Provider>

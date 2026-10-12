@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useStore } from '../context/StoreContext';
+import WishlistButton from './WishlistButton';
 
 export function formatPrice(value) {
   return `$${Number(value).toFixed(2)}`;
@@ -29,7 +30,10 @@ export default function ProductCard({ product }) {
       to={`/products/${product.slug}`}
       className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition"
     >
-      <div className="aspect-[4/3] bg-slate-100 overflow-hidden">
+      <div className="aspect-[4/3] bg-slate-100 overflow-hidden relative">
+        <div className="absolute top-2 right-2 z-10">
+          <WishlistButton productId={product.id} />
+        </div>
         {product.image_url ? (
           <img
             src={product.image_url}

@@ -10,6 +10,8 @@ A complete e-commerce frontend built with **React + Vite + Tailwind CSS**, consu
 - 🛒 Cart — quantities, remove, clear, live subtotal
 - 💳 Checkout — shipping form with validation → atomic order creation → success page
 - 📦 Order history + order detail with status badges
+- ❤️ Wishlist — heart any product, dedicated wishlist page
+- 💳 Stripe card payments — PaymentIntent flow with test-mode hint (4242…), COD fallback
 
 **Auth**
 - Register / login / logout (Sanctum tokens in localStorage)
@@ -31,6 +33,10 @@ npm install
 cp .env.example .env   # point VITE_API_URL at your API
 npm run dev            # http://localhost:5173
 ```
+
+**Stripe (optional):** add your test publishable key as `VITE_STRIPE_PK=pk_test_...`
+in `.env` (same key as the API's `STRIPE_KEY`). Without it, only cash-on-delivery
+is offered at checkout.
 
 The Laravel API must be running:
 

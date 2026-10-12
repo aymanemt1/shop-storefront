@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
+import Wishlist from './pages/Wishlist';
 import Admin from './pages/Admin';
 
 function Protected({ children }) {
@@ -56,6 +57,14 @@ function Shell() {
             element={
               <Protected>
                 <OrderDetail />
+              </Protected>
+            }
+          />
+          <Route
+            path="/wishlist"
+            element={
+              <Protected>
+                <Wishlist />
               </Protected>
             }
           />

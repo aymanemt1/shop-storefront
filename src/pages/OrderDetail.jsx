@@ -34,7 +34,7 @@ export default function OrderDetail() {
           {order.items.map((item) => (
             <div key={item.id} className="flex items-center justify-between py-3 border-b border-slate-100">
               <div>
-                <p className="font-semibold">{item.product?.name || 'Product'}</p>
+                <p className="font-semibold">{item.product_name}</p>
                 <p className="text-sm text-slate-500">
                   {formatPrice(item.unit_price)} × {item.quantity}
                 </p>
@@ -51,7 +51,7 @@ export default function OrderDetail() {
           </div>
           <div className="flex justify-between text-slate-600">
             <span>Shipping</span>
-            <span>{formatPrice(order.shipping_cost)}</span>
+            <span>{formatPrice(order.shipping)}</span>
           </div>
           <div className="flex justify-between text-lg font-extrabold pt-2">
             <span>Total</span>
