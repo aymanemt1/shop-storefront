@@ -14,18 +14,49 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState('');
+  const [seenSlug, setSeenSlug] = useState(slug);
+
+  // This route reuses the component when the slug changes. Drop the previous
+  // product before paint so Add to cart cannot submit the item you just left.
+  if (seenSlug !== slug) {
+    setSeenSlug(slug);
+    setProduct(null);
+    setRelated([]);
+    setQty(1);
+    setAdding(false);
+    setError('');
+  }
 
   useEffect(() => {
+    let cancelled = false;
+
     api
       .get(`/products/${slug}`)
       .then(async ({ data }) => {
-        setProduct(data.data);
-        const { data: rel } = await api.get('/products', {
-          params: { category: data.data.category.slug, per_page: 4 },
-        });
-        setRelated(rel.data.filter((p) => p.id !== data.data.id).slice(0, 3));
+        if (cancelled) return;
+        const next = data.data;
+        setProduct(next);
+
+        const categorySlug = next?.category?.slug;
+        if (!categorySlug) return;
+
+        try {
+          const { data: rel } = await api.get('/products', {
+            params: { category: categorySlug, per_page: 4 },
+          });
+          if (cancelled) return;
+          setRelated((rel.data || []).filter((p) => p.id !== next.id).slice(0, 3));
+        } catch {
+          // Related products are optional. A failure here must not hide the product.
+        }
       })
-      .catch(() => navigate('/', { replace: true }));
+      .catch(() => {
+        if (!cancelled) navigate('/', { replace: true });
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug, navigate]);
 
   const handleAdd = async () => {
